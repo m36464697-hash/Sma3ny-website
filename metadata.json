@@ -1,0 +1,6 @@
+{
+  "name": "Sma3ny - سمعني",
+  "description": "منصة سمعني (Sma3ny) للبحث والاستماع المباشر وتحميل الأغاني الكاملة والقرآن الكريم (114 سورة) وإنشاء قوائم التشغيل وقص النغمات مجاناً وبسرعة فائقة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
