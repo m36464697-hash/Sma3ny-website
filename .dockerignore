@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.git
+.aistudio
+.playwright-cli
+*.log
+.env
+.env.*
+!.env.example
