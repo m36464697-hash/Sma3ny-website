@@ -26,6 +26,7 @@ import { AudioVideoPlayer } from './components/AudioVideoPlayer';
 import { DownloadModal } from './components/DownloadModal';
 import { SavedLibraryModal } from './components/SavedLibraryModal';
 import { AddToPlaylistModal } from './components/AddToPlaylistModal';
+import { PromoVideoModal } from './components/PromoVideoModal';
 
 const STORAGE_KEYS = {
   SAVED_TRACKS: 'sma3ny_saved_tracks_v1',
@@ -232,6 +233,14 @@ export default function App() {
   const [downloadTargetTrack, setDownloadTargetTrack] = useState<MediaTrack | null>(null);
   const [playlistModalTrack, setPlaylistModalTrack] = useState<MediaTrack | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [promoModalOpen, setPromoModalOpen] = useState<boolean>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('promo') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
 
@@ -965,6 +974,16 @@ export default function App() {
             >
               مكتبتي وسجلي
             </a>
+            <a
+              href="#promo"
+              onClick={(e) => {
+                e.preventDefault();
+                setPromoModalOpen(true);
+              }}
+              className="text-teal-700 dark:text-teal-400 font-semibold hover:underline transition-colors"
+            >
+              الفيديو الإعلاني (45 ثانية)
+            </a>
           </div>
         </div>
       </footer>
@@ -1025,6 +1044,13 @@ export default function App() {
         onRemoveSaved={handleRemoveSavedById}
         onClearRecent={() => setRecentlyPlayed([])}
         onClearHistory={() => setDownloadHistory([])}
+      />
+
+      {/* Official 45-Second Promotional Video Preview & MP4 Download Modal */}
+      <PromoVideoModal
+        isOpen={promoModalOpen}
+        onClose={() => setPromoModalOpen(false)}
+        onPauseBackgroundAudio={() => setIsPlaying(false)}
       />
     </div>
   );
