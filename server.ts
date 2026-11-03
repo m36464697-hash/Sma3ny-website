@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
@@ -911,7 +912,7 @@ async function searchQuranMatches(query: string): Promise<MediaTrack[]> {
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = Number(process.env.SERVER_PORT || process.env.PORT) || 3000;
 
   app.use(express.json());
 
@@ -2105,15 +2106,14 @@ async function startServer() {
     }
   });
 
-  if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(__dirname, 'dist');
+  const distPath = path.join(__dirname, 'dist');
+  const isPterodactylHost = Boolean(process.env.SERVER_PORT);
+
+  if (process.env.NODE_ENV === 'production' || isPterodactylHost) {
+    if (!fs.existsSync(path.join(distPath, 'index.html'))) {
+      const { build: buildViteBundle } = await import('vite');
+      await buildViteBundle();
+    }
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       if (req.path.startsWith('/api/')) {
@@ -2122,6 +2122,13 @@ async function startServer() {
       }
       res.sendFile(path.join(distPath, 'index.html'));
     });
+  } else {
+    const { createServer: createViteServer } = await import('vite');
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
   }
 
   app.listen(PORT, '0.0.0.0', () => {
